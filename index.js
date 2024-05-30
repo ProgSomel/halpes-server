@@ -36,6 +36,12 @@ async function run() {
 
 
     //! Volunteer Posts 
+
+    app.get('/volunteer', async(req, res) => {
+      const result = await volunteerPostsCollection.find().toArray();
+      res.send(result);
+    })
+
     app.post('/volunteer', async (req, res) => {
       const volunteerData = req.body;
       
