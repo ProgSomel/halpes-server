@@ -5,7 +5,15 @@ require("dotenv").config();
 const port = process.env.PORT || 5000;
 const app = express();
 
+
+const corsOptions = {
+  origin: ["http://localhost:5173"],
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+
 //! middleWire
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const uri =
@@ -23,6 +31,18 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
+    const volunteerPostsCollection = client.db('halpes').collection('volunteerPosts');
+
+
+
+    //! Volunteer Posts 
+    app.post('/volunteer', async (req, res) => {
+      const volunteerData = req.body;
+      
+     
+      const result = await volunteerPostsCollection.insertOne(volunteerData);
+      res.send(result);
+    })
 
     
     
