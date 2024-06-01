@@ -61,7 +61,6 @@ async function run() {
 
     app.get('/volunteer/volunteerByEmail/:email', async (req, res) => {
       const email = req.params.email;
-      console.log(email);
       const query = {organizerEmail: email};
       const result = await volunteerPostsCollection.find(query).toArray();
       res.send(result);
@@ -73,6 +72,26 @@ async function run() {
      
       const result = await volunteerPostsCollection.insertOne(volunteerData);
       res.send(result);
+    })
+
+
+    app.put('/volunteer/updatePost/:id', async (req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const volunteerData = req.body;
+      const query = {_id: new ObjectId(id)};
+      const options = {upsert: true};
+
+      const updateDoc = {
+        $set: {
+          ...volunteerData,
+        }
+      };
+      const result = await volunteerPostsCollection.updateOne(query, updateDoc, options);
+      
+      res.send(result);
+      console.log(result);
+
     })
 
 
