@@ -40,7 +40,14 @@ async function run() {
     //! Volunteer Posts 
 
     app.get('/volunteer', async(req, res) => {
-      const result = await volunteerPostsCollection.find().toArray();
+      const searchedText = req.query.search;
+      
+
+      let query = {};
+      if(searchedText) {
+        query = {title: searchedText}
+      }
+      const result = await volunteerPostsCollection.find(query).toArray();
       res.send(result);
     })
 
