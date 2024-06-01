@@ -90,7 +90,6 @@ async function run() {
       const result = await volunteerPostsCollection.updateOne(query, updateDoc, options);
       
       res.send(result);
-      console.log(result);
 
     })
 
@@ -125,6 +124,13 @@ async function run() {
       }
 
      await volunteerPostsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    })
+
+    app.get('/beAvolunteer/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = {volunteerEmail: email};
+      const result = await BeAvolunteersCollection.find(query).toArray();
       res.send(result);
     })
 
