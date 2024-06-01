@@ -33,6 +33,8 @@ async function run() {
 
     const volunteerPostsCollection = client.db('halpes').collection('volunteerPosts');
 
+    const BeAvolunteersCollection = client.db('halpes').collection('beAvolunteer');
+
 
 
     //! Volunteer Posts 
@@ -55,6 +57,32 @@ async function run() {
       
      
       const result = await volunteerPostsCollection.insertOne(volunteerData);
+      res.send(result);
+    })
+
+
+    //! Be A Volunteer 
+    app.post('/beAvolunteer', async (req, res) => {
+      const beAvolunteerData = req.body;
+      const alreadyApplied = await BeAvolunteersCollection.findOne(
+        {
+        volunteerEmail: beAvolunteerData.volunteerEmail,
+        volunteerPostId: beAvolunteerData.volunteerPostId
+      }
+      )
+      if(alreadyApplied) {
+        return res.status(400).send('You have already Requested for this post');
+      }
+      const result = await BeAvolunteersCollection.insertOne(beAvolunteerData);
+
+      const query = {_id: new ObjectId(beAvolunteerData.volunteerPostId)};
+
+      const updateDoc = {
+        $inc: {
+          numberOfVolunteersNeeded: -1}
+      }
+
+     await volunteerPostsCollection.updateOne(query, updateDoc);
       res.send(result);
     })
 
