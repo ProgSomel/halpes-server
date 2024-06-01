@@ -134,6 +134,12 @@ async function run() {
       res.send(result);
     })
 
+    app.delete('/beAvolunteer/:id', async (req, res) => {
+      const id = req.params.id;
+      const result = await BeAvolunteersCollection.deleteOne({_id: new ObjectId(id)});
+      res.send(result);
+    })
+
     
     
     await client.db("admin").command({ ping: 1 });
