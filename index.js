@@ -57,6 +57,14 @@ async function run() {
       const query = {_id: new ObjectId(id)};
       const result = await volunteerPostsCollection.findOne(query);
       res.send(result);
+    });
+
+    app.get('/volunteer/volunteerByEmail/:email', async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = {organizerEmail: email};
+      const result = await volunteerPostsCollection.find(query).toArray();
+      res.send(result);
     })
 
     app.post('/volunteer', async (req, res) => {
