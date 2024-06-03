@@ -17,6 +17,27 @@ const corsOptions = {
 //! middleWire
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
+
+
+//! JWT Verify MiddleWire 
+const verifyToken = (req, res, next) => {
+  const token = req.cookies?.token;
+  if(!token) return res.status(401).send({message: "unauthorized access"});
+  if(token) {
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded)=> {
+      if(err){
+        return res.status(401).send({message: 'unauthorized access'});
+      }
+      req.user = decoded;
+
+    })
+    next();
+  }
+
+}
+
+
 
 const uri =
   `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.dzik2b9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -89,17 +110,20 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/volunteer/volunteerByEmail/:email', async (req, res) => {
+    app.get('/volunteer/volunteerByEmail/:email', verifyToken,  async (req, res) => {
+      const tokenEmail = req.user?.email;
       const email = req.params.email;
+      if(tokenEmail !== email) {
+        return res.send(403).send({message: "forbidden access"})
+      } 
       const query = {organizerEmail: email};
       const result = await volunteerPostsCollection.find(query).toArray();
       res.send(result);
     })
 
-    app.post('/volunteer', async (req, res) => {
-      const volunteerData = req.body;
+    app.post('/volunteer', verifyToken, async (req, res) => {
       
-     
+      const volunteerData = req.body;
       const result = await volunteerPostsCollection.insertOne(volunteerData);
       res.send(result);
     })
@@ -157,8 +181,12 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/beAvolunteer/:email', async (req, res) => {
+    app.get('/beAvolunteer/:email', verifyToken, async (req, res) => {
+      const tokenEmail = req.user?.email;
       const email = req.params.email;
+      if(tokenEmail !== email) {
+        return res.send(403).send({message: "forbidden access"})
+      } 
       const query = {volunteerEmail: email};
       const result = await BeAvolunteersCollection.find(query).toArray();
       res.send(result);
