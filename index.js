@@ -61,7 +61,7 @@ async function run() {
         sameSite: process.env.NODE_ENV === 'production'?'none':'strict',
         maxAge: 0,
 
-      });
+      }).send({success: true})
     })
 
 
